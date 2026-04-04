@@ -5,7 +5,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const csv = exportCSV(params.id, true)
+  const csv = exportCSV(params.id)
   if (!csv) {
     return NextResponse.json({ error: 'Conferencia not found' }, { status: 404 })
   }

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getConferencia, saveAprovacao, deleteConferencia } from '@/lib/conferencias'
-import type { Aprovacao } from '@/lib/types'
+import { getConferencia, deleteConferencia } from '@/lib/conferencias'
 
 export async function GET(
   request: Request,
@@ -11,18 +10,6 @@ export async function GET(
     return NextResponse.json({ error: 'Conferencia not found' }, { status: 404 })
   }
   return NextResponse.json(conf)
-}
-
-export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const body = await request.json() as Aprovacao
-  const ok = saveAprovacao(params.id, body)
-  if (!ok) {
-    return NextResponse.json({ error: 'Conferencia not found' }, { status: 404 })
-  }
-  return NextResponse.json({ success: true })
 }
 
 export async function DELETE(

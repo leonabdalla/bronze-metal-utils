@@ -1,11 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import type { CampoConferencia, Conferencia, ConferenciaSummary, Aprovacao, MesSummary, FornecedorGroup } from './types'
+import type { CampoConferencia, Conferencia, ConferenciaSummary, MesSummary, FornecedorGroup } from './types'
 
 const CONFERENCIAS_DIR = path.resolve(process.cwd(), '..', 'conferencias')
 
 function detectFornecedor(dirName: string): string {
-  // Extract fornecedor from folder name: YYYY-MM-DD_fornecedor_name
   const match = dirName.match(/^\d{4}-\d{2}-\d{2}_(.+)$/)
   if (match) {
     return match[1]
@@ -61,21 +60,6 @@ function parseCSV(content: string): CampoConferencia[] {
   return campos
 }
 
-function readAprovacao(conferenciaDir: string): Aprovacao | undefined {
-  const aprovacaoPath = path.join(conferenciaDir, 'aprovacao.json')
-  if (!fs.existsSync(aprovacaoPath)) return undefined
-  try {
-    const data = JSON.parse(fs.readFileSync(aprovacaoPath, 'utf-8'))
-    return {
-      ...data,
-      emailAprovador: data.emailAprovador || '',
-      observacaoGeral: data.observacaoGeral || '',
-    }
-  } catch {
-    return undefined
-  }
-}
-
 export function listConferencias(): ConferenciaSummary[] {
   if (!fs.existsSync(CONFERENCIAS_DIR)) return []
 
@@ -94,7 +78,6 @@ export function listConferencias(): ConferenciaSummary[] {
       campos = parseCSV(fs.readFileSync(csvPath, 'utf-8'))
     }
 
-    const aprovacao = readAprovacao(dirPath)
     const salesOrders = [...new Set(campos.map(c => c.salesOrder))]
     const datePart = dirName.match(/^(\d{4}-\d{2}-\d{2})/)
 
@@ -106,7 +89,6 @@ export function listConferencias(): ConferenciaSummary[] {
       totalCampos: campos.length,
       totalOK: campos.filter(c => c.status === 'OK').length,
       totalDivergencia: campos.filter(c => c.status === 'DIVERGENCIA').length,
-      statusAprovacao: aprovacao?.status || 'pendente',
     }
   })
 }
@@ -129,7 +111,6 @@ export function getConferencia(id: string): Conferencia | null {
       .sort()
   }
 
-  const aprovacao = readAprovacao(dirPath)
   const salesOrders = [...new Set(campos.map(c => c.salesOrder))]
   const datePart = id.match(/^(\d{4}-\d{2}-\d{2})/)
 
@@ -141,22 +122,9 @@ export function getConferencia(id: string): Conferencia | null {
     totalCampos: campos.length,
     totalOK: campos.filter(c => c.status === 'OK').length,
     totalDivergencia: campos.filter(c => c.status === 'DIVERGENCIA').length,
-    statusAprovacao: aprovacao?.status || 'pendente',
     campos,
     evidencias,
-    aprovacao,
   }
-}
-
-export function saveAprovacao(id: string, aprovacao: Aprovacao): boolean {
-  const dirPath = path.join(CONFERENCIAS_DIR, id)
-  if (!fs.existsSync(dirPath)) return false
-  fs.writeFileSync(
-    path.join(dirPath, 'aprovacao.json'),
-    JSON.stringify(aprovacao, null, 2),
-    'utf-8'
-  )
-  return true
 }
 
 export function getEvidenciaPath(conferenciaId: string, filename: string): string | null {
@@ -187,7 +155,6 @@ export function getConferenciasByMonth(): MesSummary[] {
     const confs = byMonth[mes]
     const mm = mes.slice(5, 7)
 
-    // Group by fornecedor
     const byFornecedor: Record<string, ConferenciaSummary[]> = {}
     for (const c of confs) {
       if (!byFornecedor[c.fornecedor]) byFornecedor[c.fornecedor] = []
@@ -201,9 +168,6 @@ export function getConferenciasByMonth(): MesSummary[] {
         conferencias: fConfs,
         totalOK: fConfs.reduce((s, c) => s + c.totalOK, 0),
         totalDivergencia: fConfs.reduce((s, c) => s + c.totalDivergencia, 0),
-        totalPendente: fConfs.filter(c => c.statusAprovacao === 'pendente').length,
-        totalAprovado: fConfs.filter(c => c.statusAprovacao === 'aprovado' || c.statusAprovacao === 'pre-aprovado').length,
-        totalReprovado: fConfs.filter(c => c.statusAprovacao === 'reprovado').length,
       }))
 
     return {
@@ -212,41 +176,26 @@ export function getConferenciasByMonth(): MesSummary[] {
       totalConferencias: confs.length,
       totalOK: confs.reduce((s, c) => s + c.totalOK, 0),
       totalDivergencia: confs.reduce((s, c) => s + c.totalDivergencia, 0),
-      totalPendente: confs.filter(c => c.statusAprovacao === 'pendente').length,
-      totalAprovado: confs.filter(c => c.statusAprovacao === 'aprovado' || c.statusAprovacao === 'pre-aprovado').length,
-      totalReprovado: confs.filter(c => c.statusAprovacao === 'reprovado').length,
       fornecedores,
       conferencias: confs,
     }
   })
 }
 
-export function exportCSV(id: string, includeAprovacao: boolean): string | null {
+export function exportCSV(id: string): string | null {
   const conf = getConferencia(id)
   if (!conf) return null
 
   const BOM = '\uFEFF'
-  let header = 'Fornecedor;Sales_Order;Campo;Valor_PO;Valor_Invoice;Valor_PL;Valor_Certificate;Status;Observacao;Evidencia_Invoice;Evidencia_PL;Evidencia_Certificate'
-  if (includeAprovacao) {
-    header += ';Status_Aprovacao;Obs_Aprovacao;Email_Aprovador'
-  }
+  const header = 'Fornecedor;Sales_Order;Campo;Valor_PO;Valor_Invoice;Valor_PL;Valor_Certificate;Status;Observacao;Evidencia_Invoice;Evidencia_PL;Evidencia_Certificate'
 
   const lines = [header]
   for (const c of conf.campos) {
-    const key = `${c.salesOrder}|${c.campo}`
-    let line = [
+    const line = [
       conf.fornecedor, c.salesOrder, c.campo, c.valorPO, c.valorInvoice, c.valorPL,
       c.valorCertificate, c.status, c.observacao,
       c.evidenciaInvoice, c.evidenciaPL, c.evidenciaCertificate
     ].join(';')
-
-    if (includeAprovacao && conf.aprovacao) {
-      const campo = conf.aprovacao.campos[key]
-      line += `;${campo?.status || 'pendente'};${campo?.obs || ''};${conf.aprovacao.emailAprovador || ''}`
-    } else if (includeAprovacao) {
-      line += ';pendente;;'
-    }
-
     lines.push(line)
   }
 
@@ -254,18 +203,9 @@ export function exportCSV(id: string, includeAprovacao: boolean): string | null 
 }
 
 export function deleteConferencia(id: string): boolean {
-  // Sanitize: only allow folder names that look like conferencia dirs
   if (!/^[\w-]+$/.test(id)) return false
   const dirPath = path.join(CONFERENCIAS_DIR, id)
   if (!fs.existsSync(dirPath)) return false
   fs.rmSync(dirPath, { recursive: true, force: true })
   return true
-}
-
-export function getUploadDir(): string {
-  const uploadDir = path.join(CONFERENCIAS_DIR, 'uploads')
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true })
-  }
-  return uploadDir
 }

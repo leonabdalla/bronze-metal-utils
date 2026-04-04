@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import type { MesSummary } from '@/lib/types'
-import { AprovacaoStatusBadge } from './StatusBadge'
 import { FilterBar } from './FilterBar'
 
 export function Dashboard() {
   const [meses, setMeses] = useState<MesSummary[]>([])
   const [loading, setLoading] = useState(true)
-  const [statusFilter, setStatusFilter] = useState('todos')
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedMonth, setExpandedMonth] = useState<string | null>(null)
   const [expandedFornecedor, setExpandedFornecedor] = useState<string | null>(null)
@@ -48,12 +46,7 @@ export function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Conferencias</h1>
-        <FilterBar
-          statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+        <FilterBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       </div>
 
       <div className="space-y-4">
@@ -62,7 +55,6 @@ export function Dashboard() {
 
           return (
             <div key={mes.mes} className="border border-gray-200 rounded-xl overflow-hidden">
-              {/* Month header */}
               <button
                 onClick={() => setExpandedMonth(isMonthOpen ? null : mes.mes)}
                 className="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition text-left"
@@ -77,13 +69,9 @@ export function Dashboard() {
                 <div className="flex gap-3 text-xs">
                   <span className="text-green-700">{mes.totalOK} OK</span>
                   <span className="text-red-700">{mes.totalDivergencia} div.</span>
-                  <span className="text-gray-400">|</span>
-                  <span className="text-green-600">{mes.totalAprovado} aprov.</span>
-                  <span className="text-yellow-600">{mes.totalPendente} pend.</span>
                 </div>
               </button>
 
-              {/* Fornecedores within month */}
               {isMonthOpen && (
                 <div className="divide-y divide-gray-100">
                   {mes.fornecedores.map(forn => {
@@ -91,9 +79,6 @@ export function Dashboard() {
                     const isFornOpen = expandedFornecedor === fornKey
 
                     let confs = forn.conferencias
-                    if (statusFilter !== 'todos') {
-                      confs = confs.filter(c => c.statusAprovacao === statusFilter)
-                    }
                     if (searchQuery) {
                       const q = searchQuery.toLowerCase()
                       confs = confs.filter(c =>
@@ -106,7 +91,6 @@ export function Dashboard() {
 
                     return (
                       <div key={fornKey}>
-                        {/* Fornecedor header */}
                         <button
                           onClick={() => setExpandedFornecedor(isFornOpen ? null : fornKey)}
                           className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition text-left pl-10"
@@ -119,12 +103,11 @@ export function Dashboard() {
                             <span className="text-xs text-gray-400">{confs.length} conferencia(s)</span>
                           </div>
                           <div className="flex gap-2 text-xs">
-                            <span className="text-green-600">{forn.totalAprovado} aprov.</span>
-                            <span className="text-yellow-600">{forn.totalPendente} pend.</span>
+                            <span className="text-green-600">{forn.totalOK} OK</span>
+                            <span className="text-red-600">{forn.totalDivergencia} div.</span>
                           </div>
                         </button>
 
-                        {/* Conferencias list */}
                         {isFornOpen && (
                           <div className="pl-16 pr-5 pb-3 space-y-2">
                             {confs.map(conf => (
@@ -134,12 +117,9 @@ export function Dashboard() {
                                 className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 hover:border-accent-400 hover:shadow-sm transition"
                               >
                                 <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-gray-900">
-                                      {conf.salesOrders.join(', ')}
-                                    </span>
-                                    <AprovacaoStatusBadge status={conf.statusAprovacao} />
-                                  </div>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {conf.salesOrders.join(', ')}
+                                  </span>
                                   <p className="text-xs text-gray-400 mt-0.5">{conf.data}</p>
                                 </div>
                                 <div className="text-right text-sm">
