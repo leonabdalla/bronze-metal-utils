@@ -1,0 +1,23 @@
+# Conferencias output (dados sensíveis)
+conferencias/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Arquivos de entrada (PDFs e Excel)
+*.xlsx
+*.pdf
+
+# IDE
+.idea/
