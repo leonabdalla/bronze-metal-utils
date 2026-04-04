@@ -51,37 +51,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* First time setup */}
-      {totalConf === 0 && (
-        <section className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Primeira vez? Configure o projeto</h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-            <p className="text-sm text-blue-800 mb-3">
-              Este projeto usa o <strong>Claude Code</strong> (CLI da Anthropic) para executar as conferencias.
-              A interface web serve apenas para visualizar e aprovar os resultados.
-            </p>
-            <p className="text-sm text-blue-700">
-              Se ainda nao tem o Claude Code instalado, siga as instrucoes em{' '}
-              <a href="https://docs.anthropic.com/en/docs/claude-code" className="underline font-medium" target="_blank" rel="noopener noreferrer">
-                docs.anthropic.com/en/docs/claude-code
-              </a>
-            </p>
-          </div>
-          <div className="bg-gray-900 rounded-xl p-6 text-sm font-mono">
-            <p className="text-gray-500 mb-2"># 1. Abra o terminal na raiz do projeto:</p>
-            <p className="text-green-400">$ claude</p>
-            <p className="text-gray-500 mt-4 mb-2"># 2. Execute o setup automatico:</p>
-            <p className="text-gray-300">
-              <span className="text-gray-500">&gt;</span> /onboard
-            </p>
-            <p className="text-gray-500 mt-4 mb-2"># 3. Depois, para rodar uma conferencia:</p>
-            <p className="text-gray-300">
-              <span className="text-gray-500">&gt;</span> /conferir
-            </p>
-          </div>
-        </section>
-      )}
-
       {/* Terminal command */}
       <section className="max-w-3xl mx-auto">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Comando no Terminal</h2>
@@ -100,6 +69,17 @@ export default function Home() {
           <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">openpyxl</code> e
           <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">tesseract</code> OCR
         </p>
+      </section>
+
+      {/* First time */}
+      <section className="max-w-3xl mx-auto">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Primeira vez?</h3>
+          <p className="text-sm text-gray-600">
+            Rode <code className="bg-gray-200 px-1.5 py-0.5 rounded text-xs">/onboard</code> no Claude Code
+            para verificar e instalar todas as dependencias automaticamente (Python, PyMuPDF, openpyxl, Tesseract, Node.js).
+          </p>
+        </div>
       </section>
 
       {/* Quick stats */}
