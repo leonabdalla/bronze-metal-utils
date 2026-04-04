@@ -12,11 +12,6 @@ export interface CampoConferencia {
   evidenciaCertificate: string
 }
 
-export interface AprovacaoCampo {
-  status: 'aprovado' | 'reprovado' | 'pendente'
-  obs: string
-}
-
 export interface Conferencia {
   id: string
   data: string

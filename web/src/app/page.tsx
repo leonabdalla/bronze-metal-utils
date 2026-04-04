@@ -45,8 +45,8 @@ export default function Home() {
           />
           <StepCard
             step="3"
-            title="Revise e aprove"
-            description="Visualize o cruzamento campo a campo com evidencias, revise divergencias e aprove com seu email."
+            title="Revise e exporte"
+            description="Visualize o cruzamento campo a campo com evidencias recortadas, revise divergencias e exporte o relatorio CSV."
           />
         </div>
       </section>
