@@ -196,8 +196,9 @@ O agent retorna JSON com status e observacao por campo.
 **Apos receber o resultado da comparacao**, gere os crops de evidencia com Python usando o OCR cache do Passo 2:
 
 ```python
-def crop_evidencia(ocr_cache, page_num, search_text, output_path, padding=30):
-    """Recorta a regiao do PDF onde o texto aparece, usando OCR."""
+def crop_evidencia(ocr_cache, page_num, search_text, output_path, padding=50):
+    """Recorta a regiao do PDF onde o texto aparece, usando OCR.
+    padding=50 garante contexto suficiente ao redor do valor encontrado."""
     page, tp = ocr_cache[page_num]
     # Buscar com textpage OCR (necessario para PDFs escaneados)
     rects = page.search_for(search_text, textpage=tp)
@@ -218,8 +219,9 @@ def crop_evidencia(ocr_cache, page_num, search_text, output_path, padding=30):
     pix.save(output_path)
     return output_path
 
-def crop_region(ocr_cache, page_num, search_texts, output_path, padding=25):
-    """Recorta regiao abrangendo multiplos termos (une o PRIMEIRO rect de cada)."""
+def crop_region(ocr_cache, page_num, search_texts, output_path, padding=40):
+    """Recorta regiao abrangendo multiplos termos (une o PRIMEIRO rect de cada).
+    padding=40 garante que o texto nao fique cortado nas bordas."""
     page, tp = ocr_cache[page_num]
     clip = None
     for txt in search_texts:
@@ -240,6 +242,7 @@ def crop_region(ocr_cache, page_num, search_texts, output_path, padding=25):
 - Usar apenas o **PRIMEIRO** resultado de cada busca (evita crops de pagina inteira)
 - Se nao encontrar, retornar None (campo fica sem evidencia, nao gerar pagina inteira)
 - O `ocr_cache` vem do Passo 2 e contem `(page, textpage)` por indice de pagina
+- **Padding generoso**: use padding=50 para `crop_evidencia` e padding=40 para `crop_region` — o crop deve conter o valor COMPLETO com contexto ao redor, nunca cortar texto
 
 **Para cada campo comparado**, gere um crop de cada documento fonte:
 - `evidencias/{SO}_{campo}_{fonte}.png`
