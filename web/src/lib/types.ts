@@ -17,15 +17,6 @@ export interface AprovacaoCampo {
   obs: string
 }
 
-export interface Aprovacao {
-  status: 'aprovado' | 'pre-aprovado' | 'reprovado' | 'pendente'
-  aprovadoPor: string
-  emailAprovador: string
-  dataAprovacao: string
-  campos: Record<string, AprovacaoCampo>
-  observacaoGeral?: string
-}
-
 export interface Conferencia {
   id: string
   data: string
@@ -34,10 +25,8 @@ export interface Conferencia {
   totalCampos: number
   totalOK: number
   totalDivergencia: number
-  statusAprovacao: 'aprovado' | 'pre-aprovado' | 'reprovado' | 'pendente'
   campos: CampoConferencia[]
   evidencias: string[]
-  aprovacao?: Aprovacao
 }
 
 export interface ConferenciaSummary {
@@ -48,7 +37,6 @@ export interface ConferenciaSummary {
   totalCampos: number
   totalOK: number
   totalDivergencia: number
-  statusAprovacao: 'aprovado' | 'pre-aprovado' | 'reprovado' | 'pendente'
 }
 
 export interface FornecedorGroup {
@@ -56,9 +44,6 @@ export interface FornecedorGroup {
   conferencias: ConferenciaSummary[]
   totalOK: number
   totalDivergencia: number
-  totalPendente: number
-  totalAprovado: number
-  totalReprovado: number
 }
 
 export interface MesSummary {
@@ -67,9 +52,6 @@ export interface MesSummary {
   totalConferencias: number
   totalOK: number
   totalDivergencia: number
-  totalPendente: number
-  totalAprovado: number
-  totalReprovado: number
   fornecedores: FornecedorGroup[]
   conferencias: ConferenciaSummary[]
 }

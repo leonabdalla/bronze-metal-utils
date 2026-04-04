@@ -1,13 +1,11 @@
 'use client'
 
 interface FilterBarProps {
-  statusFilter: string
-  onStatusChange: (v: string) => void
   searchQuery: string
   onSearchChange: (v: string) => void
 }
 
-export function FilterBar({ statusFilter, onStatusChange, searchQuery, onSearchChange }: FilterBarProps) {
+export function FilterBar({ searchQuery, onSearchChange }: FilterBarProps) {
   return (
     <div className="flex flex-wrap gap-3 items-center">
       <div className="relative">
@@ -22,17 +20,6 @@ export function FilterBar({ statusFilter, onStatusChange, searchQuery, onSearchC
           className="border border-gray-200 rounded-full pl-9 pr-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-200 focus:border-accent-400"
         />
       </div>
-      <select
-        value={statusFilter}
-        onChange={e => onStatusChange(e.target.value)}
-        className="border border-gray-200 rounded-full px-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-200 focus:border-accent-400"
-      >
-        <option value="todos">Todos</option>
-        <option value="pendente">Pendente</option>
-        <option value="pre-aprovado">Pre-aprovado</option>
-        <option value="aprovado">Aprovado</option>
-        <option value="reprovado">Reprovado</option>
-      </select>
     </div>
   )
 }
