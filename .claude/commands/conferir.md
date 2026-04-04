@@ -328,28 +328,7 @@ Use a data de hoje para o nome da pasta.
 
 ---
 
-## PASSO 7: Pre-aprovacao
-
-Se TODOS os campos estiverem `OK` e todas as evidencias tiverem sido geradas, crie o arquivo `conferencias/<YYYY-MM-DD>_<fornecedor>/aprovacao.json`:
-
-```json
-{
-  "status": "pre-aprovado",
-  "aprovadoPor": "Auto (Claude)",
-  "emailAprovador": "",
-  "dataAprovacao": "<ISO timestamp>",
-  "campos": {
-    "<salesOrder>|<campo>": { "status": "aprovado", "obs": "" }
-  },
-  "observacaoGeral": "Todos os campos conferem com o PO. Pre-aprovado automaticamente."
-}
-```
-
-Se houver qualquer `DIVERGENCIA` ou `NAO_INFORMADO`, NAO gere o aprovacao.json (fica pendente para revisao manual). Mas inclua na `Observacao` do CSV uma descricao clara do problema para facilitar a revisao.
-
----
-
-## PASSO 8: Resumo e cleanup
+## PASSO 7: Resumo e cleanup
 
 **Cleanup**: Delete todas as PNGs temporarias (`_temp_*.png`). Mantenha apenas os crops de evidencia.
 
@@ -364,9 +343,8 @@ for f in glob.glob(os.path.join(evidencias_dir, '_temp_*.png')):
 2. Quantas ordens conferidas (incluindo split orders consolidadas, mencionar quantas remessas foram agrupadas)
 3. Quantos campos OK vs DIVERGENCIA vs NAO_INFORMADO
 4. Lista das divergencias encontradas (se houver) com descricao clara
-5. Se foi pre-aprovado automaticamente ou ficou pendente
-6. Caminho dos arquivos gerados
-7. Quantidade de evidencias crop geradas
+5. Caminho dos arquivos gerados
+6. Quantidade de evidencias crop geradas
 
 ---
 

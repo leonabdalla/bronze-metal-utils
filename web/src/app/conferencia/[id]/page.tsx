@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import type { Conferencia, AprovacaoCampo } from '@/lib/types'
+import { useState, useEffect } from 'react'
+import type { Conferencia } from '@/lib/types'
 import { ConferenciaTable } from '@/components/ConferenciaTable'
 import { EvidenciaViewer, EvidenciaGallery } from '@/components/EvidenciaViewer'
 
@@ -11,28 +11,6 @@ function baseSO(so: string): string {
 
 function getBaseSOs(campos: { salesOrder: string }[]): string[] {
   return [...new Set(campos.map(c => baseSO(c.salesOrder)))]
-}
-
-const CACHE_PREFIX = 'bm_conf_'
-
-interface CacheData {
-  campos: Record<string, AprovacaoCampo>
-  savedAt: string
-}
-
-function loadCache(id: string): CacheData | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(`${CACHE_PREFIX}${id}`)
-    return raw ? JSON.parse(raw) : null
-  } catch { return null }
-}
-
-function saveCache(id: string, data: CacheData) {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(`${CACHE_PREFIX}${id}`, JSON.stringify(data))
-  } catch {}
 }
 
 function Toast({ message, type, onDone }: { message: string; type: 'success' | 'error'; onDone: () => void }) {
@@ -55,11 +33,8 @@ export default function ConferenciaDetailPage({ params }: { params: { id: string
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedEvidencia, setSelectedEvidencia] = useState<string | null>(null)
-  const [aprovacaoCampos, setAprovacaoCampos] = useState<Record<string, AprovacaoCampo>>({})
   const [showGallery, setShowGallery] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
-  const [cacheTime, setCacheTime] = useState<string | null>(null)
-  const initialLoadDone = useRef(false)
 
   useEffect(() => {
     fetch(`/api/conferencia/${params.id}`)
@@ -69,74 +44,14 @@ export default function ConferenciaDetailPage({ params }: { params: { id: string
       })
       .then((data: Conferencia) => {
         setConf(data)
-        const cached = loadCache(params.id)
-        if (cached && cached.campos && Object.keys(cached.campos).length > 0) {
-          setAprovacaoCampos(cached.campos)
-          setCacheTime(cached.savedAt || null)
-        }
         setLoading(false)
-        setTimeout(() => { initialLoadDone.current = true }, 100)
       })
       .catch(() => { setError('Conferencia nao encontrada'); setLoading(false) })
   }, [params.id])
 
-  // Auto-save to localStorage
-  useEffect(() => {
-    if (!conf || !initialLoadDone.current) return
-    const now = new Date().toLocaleTimeString()
-    saveCache(params.id, { campos: aprovacaoCampos, savedAt: now })
-    setCacheTime(now)
-  }, [aprovacaoCampos, params.id, conf])
-
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
   }
-
-  const handleCampoAprovacao = useCallback((key: string, status: AprovacaoCampo['status'], obs: string) => {
-    setAprovacaoCampos(prev => ({ ...prev, [key]: { status, obs } }))
-  }, [])
-
-  const handleApproveOrder = useCallback((so: string) => {
-    if (!conf) return
-    setAprovacaoCampos(prev => {
-      const next = { ...prev }
-      for (const c of conf.campos) {
-        if (baseSO(c.salesOrder) === so) {
-          const key = `${so}|${c.campo}`
-          next[key] = { status: 'aprovado', obs: prev[key]?.obs || '' }
-        }
-      }
-      return next
-    })
-  }, [conf])
-
-  const handleRejectOrder = useCallback((so: string) => {
-    if (!conf) return
-    setAprovacaoCampos(prev => {
-      const next = { ...prev }
-      for (const c of conf.campos) {
-        if (baseSO(c.salesOrder) === so) {
-          const key = `${so}|${c.campo}`
-          next[key] = { status: 'reprovado', obs: prev[key]?.obs || '' }
-        }
-      }
-      return next
-    })
-  }, [conf])
-
-  const handleBulkApproveAll = useCallback(() => {
-    if (!conf) return
-    setAprovacaoCampos(prev => {
-      const next = { ...prev }
-      for (const c of conf.campos) {
-        const so = baseSO(c.salesOrder)
-        const key = `${so}|${c.campo}`
-        next[key] = { status: 'aprovado', obs: prev[key]?.obs || '' }
-      }
-      return next
-    })
-    showToast('Todos os campos marcados como aprovados')
-  }, [conf])
 
   const handleExport = () => {
     window.open(`/api/export/${params.id}`, '_blank')
@@ -147,9 +62,6 @@ export default function ConferenciaDetailPage({ params }: { params: { id: string
     try {
       const res = await fetch(`/api/conferencia/${params.id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error()
-      if (typeof window !== 'undefined') {
-        try { localStorage.removeItem(`${CACHE_PREFIX}${params.id}`) } catch {}
-      }
       window.location.href = '/conferencias'
     } catch {
       showToast('Erro ao deletar conferencia', 'error')
@@ -211,11 +123,7 @@ export default function ConferenciaDetailPage({ params }: { params: { id: string
       <ConferenciaTable
         conferenciaId={conf.id}
         campos={conf.campos}
-        aprovacaoCampos={aprovacaoCampos}
-        onCampoAprovacao={handleCampoAprovacao}
         onEvidenciaClick={setSelectedEvidencia}
-        onApproveOrder={handleApproveOrder}
-        onRejectOrder={handleRejectOrder}
       />
 
       {/* Evidence gallery */}
@@ -245,29 +153,13 @@ export default function ConferenciaDetailPage({ params }: { params: { id: string
       )}
 
       {/* Action bar */}
-      <div className="bg-white border border-gray-200 rounded-lg px-4 py-4 sticky bottom-4 shadow-lg">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleBulkApproveAll}
-            className="bg-accent-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-accent-600 transition"
-          >
-            Aprovar Tudo
-          </button>
-          <button
-            onClick={handleExport}
-            className="border border-gray-300 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-gray-50 transition"
-          >
-            Exportar CSV
-          </button>
-          <div className="ml-auto flex items-center gap-2 text-xs text-gray-400">
-            {cacheTime && (
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                Salvo localmente: {cacheTime}
-              </span>
-            )}
-          </div>
-        </div>
+      <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 sticky bottom-4 shadow-lg flex items-center gap-2">
+        <button
+          onClick={handleExport}
+          className="bg-accent-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-accent-600 transition"
+        >
+          Exportar CSV
+        </button>
       </div>
     </div>
   )

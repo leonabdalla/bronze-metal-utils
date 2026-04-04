@@ -15,7 +15,7 @@ Ferramentas de conferencia de documentacao de importacao para Bronze Metal Ind. 
 ## Frontend (web/)
 - **Stack**: Next.js 14, React 18, Tailwind CSS 3, TypeScript
 - **Rodar**: `cd web && npm install && npm run dev` (porta 3000)
-- **Storage**: Filesystem — le CSVs de `conferencias/`, salva aprovacoes em `aprovacao.json`
+- **Storage**: Filesystem — le CSVs de `conferencias/`. Revisao salva em localStorage do navegador.
 - **CSV**: separador `;`, encoding UTF-8 BOM
 - **Rotas API**: `/api/conferencias`, `/api/conferencia/[id]` (GET/PATCH), `/api/evidencia/[...path]`, `/api/export/[id]`
 - **Paginas**: `/` (landing), `/conferencias` (dashboard), `/conferencia/[id]` (detalhe)
@@ -47,12 +47,6 @@ A conferencia e feita exclusivamente via terminal com o Claude CLI. Nao ha inter
 ### Requisitos
 - `claude` CLI instalado e no PATH
 - Python com `PyMuPDF` (fitz) e `openpyxl`
-
-## Fluxo de Aprovacao
-1. Claude faz a conferencia e, se tudo OK, pre-aprova automaticamente
-2. Usuario revisa cada campo (todos devem ser revisados antes de aprovar)
-3. Usuario insere email para aprovar/reprovar (pode adicionar observacao)
-4. Relatorio final CSV inclui: fornecedor, campos, status, evidencias, aprovacao, email
 
 ## Dependencias Python
 - `openpyxl` — leitura de arquivos Excel (.xlsx)

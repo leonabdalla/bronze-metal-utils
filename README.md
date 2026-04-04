@@ -85,7 +85,7 @@ cd web && npm install
 cd web && npm run dev
 ```
 
-Acesse `http://localhost:3000` para visualizar conferencias, revisar campos e aprovar/reprovar.
+Acesse `http://localhost:3000` para visualizar conferencias, revisar campos e exportar relatorios.
 
 ## Estrutura do Projeto
 
@@ -104,7 +104,6 @@ bronze-metal-utils/
 ├── conferencias/            # Output das conferencias (gitignored)
 │   └── YYYY-MM-DD_fornecedor/
 │       ├── conferencia.csv  # Relatorio de campos
-│       ├── aprovacao.json   # Status de aprovacao
 │       └── evidencias/      # Crops PNG de cada campo
 ├── CLAUDE.md                # Instrucoes do projeto
 ├── README.md                # Este arquivo
