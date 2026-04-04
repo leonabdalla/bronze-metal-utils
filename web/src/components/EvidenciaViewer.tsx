@@ -105,7 +105,7 @@ export function EvidenciaGallery({ conferenciaId, evidencias, onSelect }: Eviden
                   alt={file}
                   className="w-full h-24 object-cover object-top"
                 />
-                <p className="text-[10px] text-gray-500 p-1 truncate">{file}</p>
+                <p className="text-[10px] text-gray-500 p-1 truncate" title={file}>{file}</p>
               </button>
             ))}
           </div>

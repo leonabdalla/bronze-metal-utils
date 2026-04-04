@@ -4,6 +4,25 @@ import type { CampoConferencia, AprovacaoCampo } from '@/lib/types'
 import { CampoStatusBadge } from './StatusBadge'
 import { useState } from 'react'
 
+function TruncatedCell({ value, className }: { value: string; className?: string }) {
+  const [showTooltip, setShowTooltip] = useState(false)
+  const display = value || '-'
+  return (
+    <td
+      className={`py-2 px-3 text-gray-600 max-w-40 relative ${className || ''}`}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      <span className="block truncate">{display}</span>
+      {showTooltip && value && value.length > 20 && (
+        <div className="absolute z-50 bottom-full left-0 mb-1 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg max-w-xs whitespace-pre-wrap break-words pointer-events-none">
+          {value}
+        </div>
+      )}
+    </td>
+  )
+}
+
 interface ConferenciaTableProps {
   conferenciaId: string
   campos: CampoConferencia[]
@@ -267,10 +286,10 @@ function TableRow({
         onClick={onToggle}
       >
         <td className="py-2 px-3 font-medium text-gray-800">{campo.campo}</td>
-        <td className="py-2 px-3 text-gray-600 max-w-40 truncate" title={campo.valorPO}>{campo.valorPO || '-'}</td>
-        <td className="py-2 px-3 text-gray-600 max-w-40 truncate" title={campo.valorInvoice}>{campo.valorInvoice || '-'}</td>
-        <td className="py-2 px-3 text-gray-600 max-w-40 truncate" title={campo.valorPL}>{campo.valorPL || '-'}</td>
-        <td className="py-2 px-3 text-gray-600 max-w-40 truncate" title={campo.valorCertificate}>{campo.valorCertificate || '-'}</td>
+        <TruncatedCell value={campo.valorPO} />
+        <TruncatedCell value={campo.valorInvoice} />
+        <TruncatedCell value={campo.valorPL} />
+        <TruncatedCell value={campo.valorCertificate} />
         <td className="py-2 px-3"><CampoStatusBadge status={campo.status} /></td>
         <td className="py-2 px-3" onClick={e => e.stopPropagation()}>
           {evidencias.length > 0 ? (
