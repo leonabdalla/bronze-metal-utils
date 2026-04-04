@@ -248,24 +248,51 @@ def crop_region(ocr_cache, page_num, search_texts, output_path, padding=25):
 
 **Gere QUANTAS evidencias forem necessarias.** Cada campo pode ter multiplos crops (invoice + PL + certificate). O objetivo e que cada crop PROVE o que voce esta dizendo no CSV.
 
+### REGRA DE COBERTURA DE EVIDENCIAS
+
+**Para cada campo, gere crop de TODOS os documentos que contenham aquele dado.** O CSV tem 3 colunas de evidencia: `Evidencia_Invoice`, `Evidencia_PL`, `Evidencia_Certificate`. Se o dado aparece nos 3 documentos, as 3 colunas devem ter crop. Se aparece em 2, preencha 2.
+
+A tabela abaixo indica onde cada campo TIPICAMENTE aparece. Gere crop de cada documento marcado:
+
+| Campo | Invoice | Packing List | Certificate |
+|-------|---------|--------------|-------------|
+| Endereco | crop endereco | crop bill to | - |
+| Incoterms | crop FOB | crop (se tiver) | - |
+| Payment Terms | crop Net 120 | - | - |
+| Alloy | crop alloy | crop alloy | crop alloy |
+| Temper | crop temper | crop temper | crop temper |
+| Form | crop form | crop form | - |
+| Dims (PO) | crop dims | crop dims | - |
+| Dims Reais (Ultrasonic) | - | - | crop ultrasonic |
+| Qty | crop qty | crop delivered | - |
+| Unit Price | crop price | - | - |
+| Amount | crop total | - | - |
+| Heat Number | - | - | crop heat |
+| Hardness | - | - | crop hardness |
+| %IACS | - | - | crop IACS |
+| HTS Code | crop HTS | - | - |
+| Spec | crop spec | crop spec | crop spec |
+
+**IMPORTANTE**: Se ao ler o documento voce encontrar o dado em um documento nao marcado acima (ex: Alloy no Certificate), gere crop dele tambem. A tabela e um minimo, nao um maximo.
+
 ### Campos a validar POR CADA Sales Order:
 
 1. **Endereco**: PO (cabecalho) vs Invoice Address vs Bill To (PL). Enderecos validos: SP (CNPJ 0001/13), Itajai (CNPJ 0002/02), Miami ECU.
 2. **Incoterms**: PO vs Invoice (tipicamente FOB MIAMI)
 3. **Payment Terms**: PO vs Invoice (tipicamente Net 120 Days)
-4. **Alloy/Material**: PO → identico nos outros documentos
-5. **Temper**: PO → identico (normalizar variacoes como "AT TF00" vs "TF00")
-6. **Form**: PO → identico (Plate = P, Round = RW, etc.)
-7. **Dims (PO)**: PO → comparar com tolerancia contra Invoice e PL
+4. **Alloy/Material**: PO vs Invoice vs PL vs Certificate — identico em todos
+5. **Temper**: PO vs Invoice vs PL vs Certificate — identico (normalizar "AT TF00" vs "TF00")
+6. **Form**: PO vs Invoice vs PL — identico (Plate = P, Round = RW, etc.)
+7. **Dims (PO)**: PO vs Invoice vs PL — comparar com tolerancia
 8. **Dims Reais (Ultrasonic)**: Dimensoes reais do Certificate vs Dim 2 e Dim 3 da PO (tolerancia)
-9. **Qty**: Invoice deve ser >= PO (pode haver overshipment). PL Delivered deve bater com Invoice. Para split orders, somar.
+9. **Qty**: Invoice vs PO (pode haver overshipment). PL Delivered deve bater com Invoice. Para split orders, somar.
 10. **Unit Price**: PO vs Invoice
 11. **Amount**: Qty x Unit Price (verificar calculo)
 12. **Heat Number**: so validar se PO tiver — comparar com Certificate
 13. **Hardness**: so validar se PO tiver — comparar com Certificate (verificar faixa)
 14. **%IACS**: so validar se PO tiver (e nao for "MEDIR") — comparar com Certificate
 15. **HTS Code**: so validar se PO tiver — comparar com Invoice/Export PL
-16. **Spec**: PO vs documentos
+16. **Spec**: PO vs Invoice vs PL vs Certificate — todos que tiverem
 
 **Status possiveis:**
 - `OK` — valores conferem entre PO e o(s) documento(s)
