@@ -71,6 +71,24 @@ export default function Home() {
         </p>
       </section>
 
+      {/* Email report */}
+      <section className="max-w-3xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Enviar Relatorio por Email</h2>
+        <div className="bg-gray-900 rounded-xl p-6 text-sm font-mono">
+          <p className="text-gray-500 mb-2"># Apos a conferencia, gere o PDF e prepare o email:</p>
+          <p className="text-green-400">$ claude</p>
+          <p className="text-gray-300 mt-2">
+            <span className="text-gray-500">&gt;</span> /relatorio-email
+          </p>
+          <p className="text-gray-500 mt-4"># Informe o idioma (pt/en/es), destinatario e nome.</p>
+          <p className="text-gray-500"># O PDF sera salvo na pasta da conferencia.</p>
+        </div>
+        <p className="text-sm text-gray-500 mt-4 text-center">
+          O relatorio PDF e gerado em <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">conferencias/&lt;data&gt;_&lt;fornecedor&gt;/relatorio.pdf</code>.
+          Um rascunho e criado no Gmail — <strong>arraste o PDF para o rascunho</strong> antes de enviar.
+        </p>
+      </section>
+
       {/* First time */}
       <section className="max-w-3xl mx-auto">
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
