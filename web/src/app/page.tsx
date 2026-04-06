@@ -1,0 +1,136 @@
+import { listConferencias } from '@/lib/conferencias'
+
+export default function Home() {
+  const conferencias = listConferencias()
+  const totalConf = conferencias.length
+  const totalOK = conferencias.reduce((s, c) => s + c.totalOK, 0)
+  const totalDiv = conferencias.reduce((s, c) => s + c.totalDivergencia, 0)
+
+  return (
+    <div className="space-y-16">
+      {/* Hero */}
+      <section className="bg-gray-900 text-white -mx-6 -mt-10 px-6 py-20">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-4xl font-bold tracking-tight">
+            Conferencia de Documentacao de Importacao
+          </h1>
+          <p className="mt-4 text-lg text-gray-300">
+            Cruzamento automatico de Purchase Order, Invoice, Packing List e Certificate of Conformance
+            para verificacao de importacoes da Bronze Metal.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-4 justify-center">
+            <a
+              href="/conferencias"
+              className="bg-accent-500 hover:bg-accent-600 text-white px-6 py-3 rounded-lg text-sm font-medium transition"
+            >
+              Ver Conferencias
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Como Funciona</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <StepCard
+            step="1"
+            title="Prepare os arquivos"
+            description="Tenha o PDF do fornecedor (Invoice + Packing List + Certificate) e o Excel da PO (Purchase Order) da Bronze Metal."
+          />
+          <StepCard
+            step="2"
+            title="Execute o Claude"
+            description="Rode o comando /conferir no terminal com o Claude CLI para processamento automatico."
+          />
+          <StepCard
+            step="3"
+            title="Revise e exporte"
+            description="Visualize o cruzamento campo a campo com evidencias recortadas, revise divergencias e exporte o relatorio CSV."
+          />
+        </div>
+      </section>
+
+      {/* Terminal command */}
+      <section className="max-w-3xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Comando no Terminal</h2>
+        <div className="bg-gray-900 rounded-xl p-6 text-sm font-mono">
+          <p className="text-gray-500 mb-2"># Na raiz do projeto, com os arquivos PDF e Excel disponiveis:</p>
+          <p className="text-green-400">$ claude</p>
+          <p className="text-gray-300 mt-2">
+            <span className="text-gray-500">&gt;</span> /conferir
+          </p>
+          <p className="text-gray-500 mt-4"># O Claude vai pedir o PDF e o Excel, extrair evidencias,</p>
+          <p className="text-gray-500"># cruzar todos os campos e gerar o relatorio automaticamente.</p>
+        </div>
+        <p className="text-sm text-gray-500 mt-4 text-center">
+          Requisitos: <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">claude</code> CLI,
+          Python com <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">PyMuPDF</code>,
+          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">openpyxl</code> e
+          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">tesseract</code> OCR
+        </p>
+      </section>
+
+      {/* Email report */}
+      <section className="max-w-3xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Enviar Relatorio por Email</h2>
+        <div className="bg-gray-900 rounded-xl p-6 text-sm font-mono">
+          <p className="text-gray-500 mb-2"># Apos a conferencia, gere o PDF e prepare o email:</p>
+          <p className="text-green-400">$ claude</p>
+          <p className="text-gray-300 mt-2">
+            <span className="text-gray-500">&gt;</span> /relatorio-email
+          </p>
+          <p className="text-gray-500 mt-4"># Informe o idioma (pt/en/es), destinatario e nome.</p>
+          <p className="text-gray-500"># O PDF sera salvo na pasta da conferencia.</p>
+        </div>
+        <p className="text-sm text-gray-500 mt-4 text-center">
+          O relatorio PDF e gerado em <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">conferencias/&lt;data&gt;_&lt;fornecedor&gt;/relatorio.pdf</code>.
+          Um rascunho e criado no Gmail — <strong>arraste o PDF para o rascunho</strong> antes de enviar.
+        </p>
+      </section>
+
+      {/* First time */}
+      <section className="max-w-3xl mx-auto">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Primeira vez?</h3>
+          <p className="text-sm text-gray-600">
+            Rode <code className="bg-gray-200 px-1.5 py-0.5 rounded text-xs">/onboard</code> no Claude Code
+            para verificar e instalar todas as dependencias automaticamente (Python, PyMuPDF, openpyxl, Tesseract, Node.js).
+          </p>
+        </div>
+      </section>
+
+      {/* Quick stats */}
+      {totalConf > 0 && (
+        <section className="max-w-2xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="bg-gray-50 rounded-xl p-6">
+              <p className="text-3xl font-bold text-gray-900">{totalConf}</p>
+              <p className="text-sm text-gray-500 mt-1">Conferencias</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <p className="text-3xl font-bold text-green-700">{totalOK}</p>
+              <p className="text-sm text-gray-500 mt-1">Campos OK</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <p className="text-3xl font-bold text-red-700">{totalDiv}</p>
+              <p className="text-sm text-gray-500 mt-1">Divergencias</p>
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
+  )
+}
+
+function StepCard({ step, title, description }: { step: string; title: string; description: string }) {
+  return (
+    <div className="bg-gray-50 rounded-xl p-6 text-center">
+      <div className="w-10 h-10 rounded-full bg-accent-500 text-white font-bold flex items-center justify-center mx-auto mb-4">
+        {step}
+      </div>
+      <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-sm text-gray-600">{description}</p>
+    </div>
+  )
+}
