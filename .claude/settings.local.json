@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm --version)",
       "Bash(tesseract --version)",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }

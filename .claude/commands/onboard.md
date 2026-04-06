@@ -102,7 +102,15 @@ mkdir -p conferencias
 
 ---
 
-## Passo 7: Resumo
+## Passo 7: Iniciar o dashboard web
+
+Use a ferramenta `mcp__Claude_Preview__preview_start` com `name: "Next.js (web)"` para iniciar o dashboard e abrir a aba de preview automaticamente.
+
+A configuracao ja esta em `.claude/launch.json`. Se a porta 3000 estiver ocupada, o servidor sobe em outra porta automaticamente (autoPort esta habilitado).
+
+---
+
+## Passo 8: Resumo
 
 Apresente uma tabela com o status de cada componente:
 
@@ -116,7 +124,8 @@ Apresente uma tabela com o status de cada componente:
 | npm | OK/FALHA | x.x |
 | web/node_modules | OK/INSTALADO | - |
 | conferencias/ | OK/CRIADO | - |
+| Dashboard web | OK/FALHA | - |
 
 Se tudo OK, informe:
 - Para rodar uma conferencia: `/conferir`
-- Para iniciar o dashboard web: `cd web && npm run dev` e acesse http://localhost:3000
+- Dashboard ja aberto na aba de preview

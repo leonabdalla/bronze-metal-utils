@@ -36,7 +36,8 @@ O `/onboard` vai:
 3. Verificar Tesseract OCR e Node.js
 4. Rodar `npm install` no dashboard web (corrigindo automaticamente problemas de registry privado)
 5. Criar a pasta `conferencias/`
-6. Exibir uma tabela de status de todos os componentes
+6. **Iniciar o dashboard web e abrir a aba de preview automaticamente**
+7. Exibir uma tabela de status de todos os componentes
 
 ### 3. Setup manual
 
@@ -86,20 +87,29 @@ cd web && npm install
 
 ### Dashboard web
 
+No Claude Code, rode:
+
+```
+/onboard
+```
+
+O dashboard abre automaticamente na aba de preview. Alternativamente, via terminal:
+
 ```bash
 cd web && npm run dev
 ```
-
-Acesse `http://localhost:3000` para visualizar conferencias, revisar campos e exportar relatorios.
 
 ## Estrutura do Projeto
 
 ```
 bronze-metal-utils/
 ├── .claude/
-│   └── commands/
-│       ├── conferir.md      # Skill de conferencia
-│       └── onboard.md       # Skill de setup inicial
+│   ├── commands/
+│   │   ├── conferir.md      # Skill de conferencia
+│   │   ├── onboard.md       # Skill de setup inicial
+│   │   └── relatorio-email.md
+│   ├── launch.json          # Config dos servidores de dev (preview_start)
+│   └── settings.json        # Permissoes pre-aprovadas
 ├── web/                     # Dashboard Next.js 14
 │   ├── src/
 │   │   ├── app/             # Rotas e paginas
