@@ -15,39 +15,44 @@ Cruzamento automatico de Purchase Order (PO), Invoice, Packing List e Certificat
 
 ## Instalacao
 
-### 1. Clonar o repositorio
+### 1. Pre-requisito: Claude Code
 
-```bash
-git clone https://github.com/seu-usuario/bronze-metal-utils.git
-cd bronze-metal-utils
-```
+Instale o Claude Code CLI: https://docs.anthropic.com/en/docs/claude-code
 
-### 2. Setup automatico (recomendado)
+### 2. Setup completo com um prompt
 
-Com o Claude Code instalado, basta rodar:
-
-```bash
-claude
-```
-
-E no prompt do Claude:
+Abra o Claude Code na pasta do usuario (`~/dev`), cole o prompt abaixo e **ative "ignorar permissoes"** (bypass permissions) para que o Claude execute todos os comandos sem pedir confirmacao a cada passo:
 
 ```
-/onboard
+Clone o repositorio https://github.com/leonabdalla/bronze-metal-utils.git em ~/dev/bronze-metal-utils (crie a pasta ~/dev se nao existir). Depois, entre na pasta e execute o skill /onboard para instalar todas as dependencias automaticamente. Rode tudo sem pedir confirmacao entre os passos.
 ```
 
-O skill `/onboard` verifica e instala todas as dependencias automaticamente.
+> **Como ativar "ignorar permissoes" no Claude Code**
+> No canto inferior direito da janela do Claude Code, clique em **"Auto-approve"** ou use o atalho de permissoes para liberar execucao de comandos sem confirmacao manual. Isso e necessario para que a instalacao rode de ponta a ponta sem interrupcao.
+
+O `/onboard` vai:
+1. Verificar e instalar Python 3.12 (via `winget` no Windows)
+2. Instalar `openpyxl` e `PyMuPDF` via pip
+3. Verificar Tesseract OCR e Node.js
+4. Rodar `npm install` no dashboard web (corrigindo automaticamente problemas de registry privado)
+5. Criar a pasta `conferencias/`
+6. Exibir uma tabela de status de todos os componentes
 
 ### 3. Setup manual
 
 Se preferir instalar manualmente:
 
 ```bash
-# Dependencias Python
-pip install openpyxl PyMuPDF
+# Python (Windows)
+winget install Python.Python.3.12 --accept-source-agreements --accept-package-agreements
 
-# Tesseract OCR (macOS)
-brew install tesseract
+# Dependencias Python (use o caminho completo se python nao estiver no PATH)
+python -m pip install openpyxl PyMuPDF
+
+# Tesseract OCR
+# Windows: winget install UB-Mannheim.TesseractOCR
+# macOS:   brew install tesseract
+# Linux:   apt install tesseract-ocr
 
 # Dashboard web
 cd web && npm install
