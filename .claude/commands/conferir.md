@@ -101,11 +101,9 @@ Extraia para cada **linha de item** da PO:
 
 ---
 
-## PASSO 2: Converter PDF em paginas temporarias + preparar OCR
+## PASSO 2: Converter PDF em paginas temporarias
 
-**IMPORTANTE**: PDFs de fornecedor sao geralmente imagens escaneadas (sem texto selecionavel). E necessario rodar OCR (Tesseract) para poder localizar texto e gerar crops precisos.
-
-Use Python com PyMuPDF para converter cada pagina em PNG temporaria E preparar OCR:
+Use Python com PyMuPDF para converter cada pagina em PNG temporaria para leitura visual:
 
 ```python
 import fitz
@@ -115,26 +113,19 @@ def extrair_paginas_png(pdf_path, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     doc = fitz.open(pdf_path)
     arquivos = []
-    ocr_cache = {}  # Cache de textpages OCR por pagina
 
     for i, page in enumerate(doc):
-        # Gerar PNG temporaria para leitura visual
         pix = page.get_pixmap(dpi=200)
         nome = f"_temp_pagina_{i+1:02d}.png"
         caminho = os.path.join(output_dir, nome)
         pix.save(caminho)
         arquivos.append(caminho)
 
-        # Rodar OCR e cachear textpage (necessario para crops depois)
-        tp = page.get_textpage_ocr(language="eng", dpi=200, full=True)
-        ocr_cache[i] = (page, tp)
-
     # NAO fechar o doc — necessario para crops depois
-    return doc, arquivos, ocr_cache
+    return doc, arquivos
 ```
 
 Salve as PNGs temporarias em `conferencias/<YYYY-MM-DD>_<fornecedor>/evidencias/`.
-O `ocr_cache` sera usado no Passo 5 para gerar crops precisos.
 
 ---
 
@@ -193,56 +184,23 @@ Passe ao agent: dados do PO + dados extraidos dos documentos.
 O agent retorna JSON com status e observacao por campo.
 ```
 
-**Apos receber o resultado da comparacao**, gere os crops de evidencia com Python usando o OCR cache do Passo 2:
+**Apos receber o resultado da comparacao**, gere os crops de evidencia com Python usando coordenadas de regiao de cada pagina:
 
 ```python
-def crop_evidencia(ocr_cache, page_num, search_text, output_path, padding=50):
-    """Recorta a regiao do PDF onde o texto aparece, usando OCR.
-    padding=50 garante contexto suficiente ao redor do valor encontrado."""
-    page, tp = ocr_cache[page_num]
-    # Buscar com textpage OCR (necessario para PDFs escaneados)
-    rects = page.search_for(search_text, textpage=tp)
-    if not rects:
-        # Fallback: tenta com palavras parciais
-        for word in search_text.split():
-            if len(word) >= 3:
-                rects = page.search_for(word, textpage=tp)
-                if rects:
-                    break
-    if not rects:
-        # Texto nao encontrado pelo OCR — retorna None (sem fallback de pagina inteira)
-        return None
-    # Usar apenas o PRIMEIRO resultado (nao unir todos — evita crops gigantes)
-    r = rects[0]
-    clip = (r + (-padding, -padding, padding, padding)) & page.rect
-    pix = page.get_pixmap(dpi=200, clip=clip)
+def crop_regiao(doc, page_idx, rect_pts, output_path, dpi=200):
+    """Recorta uma regiao da pagina por coordenadas (x0, y0, x1, y1) em pontos PDF."""
+    page = doc[page_idx]
+    clip = fitz.Rect(*rect_pts) & page.rect
+    pix = page.get_pixmap(dpi=dpi, clip=clip)
     pix.save(output_path)
-    return output_path
-
-def crop_region(ocr_cache, page_num, search_texts, output_path, padding=40):
-    """Recorta regiao abrangendo multiplos termos (une o PRIMEIRO rect de cada).
-    padding=40 garante que o texto nao fique cortado nas bordas."""
-    page, tp = ocr_cache[page_num]
-    clip = None
-    for txt in search_texts:
-        rects = page.search_for(txt, textpage=tp)
-        if rects:
-            r = rects[0]  # Apenas o primeiro de cada termo
-            clip = r if clip is None else (clip | r)
-    if clip is None:
-        return None
-    clip = (clip + (-padding, -padding, padding, padding)) & page.rect
-    pix = page.get_pixmap(dpi=200, clip=clip)
-    pix.save(output_path)
-    return output_path
+    return os.path.basename(output_path)
 ```
 
 **Regras para crops:**
-- Usar `search_for(text, textpage=tp)` com o OCR textpage — NUNCA sem textpage
-- Usar apenas o **PRIMEIRO** resultado de cada busca (evita crops de pagina inteira)
-- Se nao encontrar, retornar None (campo fica sem evidencia, nao gerar pagina inteira)
-- O `ocr_cache` vem do Passo 2 e contem `(page, textpage)` por indice de pagina
-- **Padding generoso**: use padding=50 para `crop_evidencia` e padding=40 para `crop_region` — o crop deve conter o valor COMPLETO com contexto ao redor, nunca cortar texto
+- Usar coordenadas de regiao (`fitz.Rect`) baseadas no layout visual de cada tipo de documento
+- Regioes padrao para paginas portrait de invoice (~610x789pt): cabecalho, endereco, tabela de itens, total
+- Se a regiao estiver vazia ou errada, ajustar as coordenadas — nunca retornar pagina inteira
+- **Padding generoso**: as regioes devem conter o valor COMPLETO com contexto ao redor, nunca cortar texto
 
 **Para cada campo comparado**, gere um crop de cada documento fonte:
 - `evidencias/{SO}_{campo}_{fonte}.png`

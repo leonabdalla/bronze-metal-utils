@@ -51,22 +51,7 @@ Onde `$PYTHON_EXE` e o caminho completo do Python encontrado, ex:
 
 ---
 
-## Passo 3: Verificar Tesseract OCR
-
-```bash
-tesseract --version
-```
-
-Se nao encontrar:
-- **Windows**: `winget install UB-Mannheim.TesseractOCR --accept-source-agreements --accept-package-agreements`
-- **macOS**: `brew install tesseract`
-- **Linux**: `apt install tesseract-ocr`
-
-Tesseract e necessario para OCR de PDFs escaneados.
-
----
-
-## Passo 4: Verificar Node.js e npm
+## Passo 3: Verificar Node.js e npm
 
 ```bash
 node --version
@@ -119,7 +104,6 @@ Apresente uma tabela com o status de cada componente:
 | Python | OK/INSTALADO/FALHA | x.x |
 | openpyxl | OK/INSTALADO/FALHA | x.x |
 | PyMuPDF | OK/INSTALADO/FALHA | x.x |
-| Tesseract | OK/FALHA | x.x |
 | Node.js | OK/FALHA | x.x |
 | npm | OK/FALHA | x.x |
 | web/node_modules | OK/INSTALADO | - |

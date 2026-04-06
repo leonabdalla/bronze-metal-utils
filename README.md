@@ -11,7 +11,6 @@ Cruzamento automatico de Purchase Order (PO), Invoice, Packing List e Certificat
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | - | CLI que executa as conferencias |
 | Python | 3.10+ | Processamento de PDF e Excel |
 | Node.js | 18+ | Dashboard web (Next.js) |
-| Tesseract OCR | 5.x | Reconhecimento de texto em PDFs escaneados |
 
 ## Instalacao
 
@@ -33,7 +32,7 @@ Clone o repositorio https://github.com/leonabdalla/bronze-metal-utils.git em ~/d
 O `/onboard` vai:
 1. Verificar e instalar Python 3.12 (via `winget` no Windows)
 2. Instalar `openpyxl` e `PyMuPDF` via pip
-3. Verificar Tesseract OCR e Node.js
+3. Verificar Node.js
 4. Rodar `npm install` no dashboard web (corrigindo automaticamente problemas de registry privado)
 5. Criar a pasta `conferencias/`
 6. **Iniciar o dashboard web e abrir a aba de preview automaticamente**
@@ -49,11 +48,6 @@ winget install Python.Python.3.12 --accept-source-agreements --accept-package-ag
 
 # Dependencias Python (use o caminho completo se python nao estiver no PATH)
 python -m pip install openpyxl PyMuPDF
-
-# Tesseract OCR
-# Windows: winget install UB-Mannheim.TesseractOCR
-# macOS:   brew install tesseract
-# Linux:   apt install tesseract-ocr
 
 # Dashboard web
 cd web && npm install
@@ -128,6 +122,6 @@ bronze-metal-utils/
 ## Stack
 
 - **CLI**: Claude Code (Anthropic)
-- **Backend/Processing**: Python 3 (PyMuPDF, openpyxl, Tesseract OCR)
+- **Backend/Processing**: Python 3 (PyMuPDF, openpyxl)
 - **Frontend**: Next.js 14, React 18, Tailwind CSS 3, TypeScript
 - **Storage**: Filesystem (CSVs + JSONs + PNGs)

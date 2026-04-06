@@ -52,6 +52,13 @@ A conferencia e feita exclusivamente via terminal com o Claude CLI. Nao ha inter
 - `openpyxl` — leitura de arquivos Excel (.xlsx)
 - `PyMuPDF` (fitz) — conversao de PDF para PNG
 
+## Nota sobre PDFs Escaneados
+Os PDFs usados atualmente nao contem texto embutido (sao imagens escaneadas). O workflow usa leitura visual das paginas PNG + crops por coordenadas de regiao — sem necessidade de Tesseract OCR.
+
+Se no futuro algum fornecedor enviar PDFs com texto embutido (digitais), o `page.get_text()` do PyMuPDF extrai o texto diretamente, tambem sem Tesseract.
+
+Tesseract so seria necessario se precisar extrair texto de PDFs escaneados de forma programatica (ex: busca por palavra para crops precisos). Nesse caso, instalar via `winget install UB-Mannheim.TesseractOCR` e usar `page.get_textpage_ocr()`.
+
 ## Dados da Bronze Metal (referencia para validacao)
 - **Razao Social**: Bronze Metal Ind. E Com Ltda
 - **CNPJ**: 51.961.365/0001-13 (SP) / 51.961.365/0002-02 (Itajai)

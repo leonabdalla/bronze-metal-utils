@@ -65,9 +65,8 @@ export default function Home() {
         </div>
         <p className="text-sm text-gray-500 mt-4 text-center">
           Requisitos: <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">claude</code> CLI,
-          Python com <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">PyMuPDF</code>,
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">openpyxl</code> e
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">tesseract</code> OCR
+          Python com <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">PyMuPDF</code> e
+          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">openpyxl</code>
         </p>
       </section>
 
@@ -95,7 +94,7 @@ export default function Home() {
           <h3 className="text-sm font-semibold text-gray-700 mb-2">Primeira vez?</h3>
           <p className="text-sm text-gray-600">
             Rode <code className="bg-gray-200 px-1.5 py-0.5 rounded text-xs">/onboard</code> no Claude Code
-            para verificar e instalar todas as dependencias automaticamente (Python, PyMuPDF, openpyxl, Tesseract, Node.js).
+            para verificar e instalar todas as dependencias automaticamente (Python, PyMuPDF, openpyxl, Node.js).
           </p>
         </div>
       </section>
